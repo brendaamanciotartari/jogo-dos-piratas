@@ -3,49 +3,99 @@ const World = Matter.World;
 const Bodies = Matter.Bodies;
 const Constraint = Matter.Constraint;
 
-var engine, world, backgroundImg;
-var canvas, angle, tower, ground, cannon;
-var cannonBall;
+var engine, world,chao;
+var fundo;
+var torre;
+var torreImg;
+
+var canhao;
+var ang;
+var bala;
+
+var balas = [];
+
 
 function preload() {
-  backgroundImg = loadImage("./assets/background.gif");
-  towerImage = loadImage("./assets/tower.png");
+ fundo = loadImage("./assets/background.gif");
+ torreImg = loadImage("./assets/tower.png");
 }
 
 function setup() {
+
   canvas = createCanvas(1200, 600);
   engine = Engine.create();
   world = engine.world;
-  angle = 20
+  
+ options={
+ isStatic:true
+ }
+ 
+ chao= Bodies.rectangle(0,height-1, width*2,1,options);
+ World.add(world,chao);
 
-  ground = Bodies.rectangle(0, height - 1, width * 2, 1, { isStatic: true });
-  World.add(world, ground);
+ torre = Bodies.rectangle(160,350,160,310,options);
+ World.add(world,torre);
+ 
+ angleMode(DEGREES);
+ ang = 20;
+ canhao = new Canhao(180, 120, 130, 100, ang);
 
-  tower = Bodies.rectangle(160, 350, 160, 310, { isStatic: true });
-  World.add(world, tower);
 
-  cannon = new Cannon(180, 110, 130, 100, angle);
-  cannonBall = new CannonBall(cannon.x, cannon.y);
 }
 
 function draw() {
   background(189);
-  image(backgroundImg, 0, 0, width, height);
+  image(fundo, 0, 0, 1200, 600);
 
   Engine.update(engine);
+ 
+ rect(chao.position.x, chao.position.y,width*2,1);
 
-  rect(ground.position.x, ground.position.y, width * 2, 1);
-  push();
-  imageMode(CENTER);
-  image(towerImage, tower.position.x, tower.position.y, 160, 310);
-  pop();
+ push();
+ imageMode(CENTER);
+ image(torreImg,torre.position.x, torre.position.y, 160, 310);
+ pop();
+  
+ canhao.mostrar();
+ for(var i = 0; i<balas.length; i++){
+   mostrarBalas(balas[i], i);
+ }
 
-  cannon.display();
-  cannonBall.display();
 }
 
 function keyReleased(){
   if(keyCode === DOWN_ARROW){
-    cannonBall.atirar();
+    balas[balas.length -1].atirar();
+  }
+
+}
+
+function keyPressed(){
+  if(keyCode === DOWN_ARROW){
+  var bala = new Bala(canhao.x, canhao.y);
+  balas.push(bala);
   }
 }
+
+function mostrarBalas(bala,i){
+  if (balas){
+    bala.mostrar();
+  } 
+}
+
+
+//Exemplos de matrizes
+var matriz1 = [1,2,3,4];
+//console.log(matriz1);
+
+var matriz2 = [1, "Melissa", true];
+//console.log(matriz2[1]);
+
+var matriz3 = [matriz1, matriz2];
+//console.log(matriz3[1][2]);
+
+matriz1.push(5);
+//console.log(matriz1);
+
+matriz1.pop();
+//console.log(matriz1);
