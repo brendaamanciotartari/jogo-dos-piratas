@@ -11,8 +11,10 @@ var torreImg;
 var canhao;
 var ang;
 var bala;
+var navio;
 
 var balas = [];
+var navios = [];
 
 
 function preload() {
@@ -40,7 +42,6 @@ function setup() {
  ang = 20;
  canhao = new Canhao(180, 120, 130, 100, ang);
 
-
 }
 
 function draw() {
@@ -57,9 +58,13 @@ function draw() {
  pop();
   
  canhao.mostrar();
+ mostrarNavios();
+
  for(var i = 0; i<balas.length; i++){
    mostrarBalas(balas[i], i);
  }
+
+
 
 }
 
@@ -81,6 +86,27 @@ function mostrarBalas(bala,i){
   if (balas){
     bala.mostrar();
   } 
+}
+
+function mostrarNavios(){
+  if (navios.length>0){
+    if (navios[navios.length-1] === undefined || navios[navios.length-1].corpo.position.x < width -300){
+      var positions = [-40, -60, -70, -20];
+      var position = random(positions);
+      var  navio = new Navio(width, height-60, 170, 170, position);
+      navios.push(navio);
+    } 
+    
+    for(var i = 0; i<navios.length; i++){
+      if (navios[i]){
+        Matter.Body.setVelocity(navios[i].corpo, {x:-0.9,y:0});
+        navios[i].mostrar();
+      }
+    }
+  } else {
+    var  navio = new Navio(width, height-60, 170, 170, -60);
+    navios.push(navio);
+  }
 }
 
 
