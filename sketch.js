@@ -62,6 +62,7 @@ function draw() {
 
  for(var i = 0; i<balas.length; i++){
    mostrarBalas(balas[i], i);
+   colisao(i);
  }
 
 
@@ -83,8 +84,11 @@ function keyPressed(){
 }
 
 function mostrarBalas(bala,i){
-  if (balas){
+  if (bala){
     bala.mostrar();
+    if(bala.corpo.position.x>=width || bala.corpo.position.y >= height - 50){
+      bala.deletar(i);
+    }
   } 
 }
 
@@ -106,6 +110,19 @@ function mostrarNavios(){
   } else {
     var  navio = new Navio(width, height-60, 170, 170, -60);
     navios.push(navio);
+  }
+}
+
+function colisao(index){
+  for(var i = 0; i<navios.length; i++){
+    if(balas[index] !== undefined && navios[i] !== undefined){
+      var colide = Matter.SAT.collides(balas[index].corpo, navios[i].corpo);
+      if(colide.collided){
+        navios[i].deletar(i);
+        Matter.World.remove(world,balas[index].corpo);
+        delete balas[index];
+      }
+    }
   }
 }
 
