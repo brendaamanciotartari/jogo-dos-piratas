@@ -7,16 +7,27 @@ class Bala {
         this.corpo = Bodies.circle(x, y, this.raio, config);
         this.imagem = loadImage("./assets/cannonball.png");
         this.rastro = [];
+        this.vel = 0.05;
+        this.afundou = false;
+        this.animation = [this.imagem];
         World.add(world, this.corpo);
     }
 
+    animacao(){
+        this.vel += 0.05;
+    }
+
     mostrar(){
+        var angle = this.corpo.angle;
         var pos = this.corpo.position;
+        var index = floor(this.vel % this.animation.length);
         push();
+        translate(pos.x, pos.y);
+        rotate(angle);
         imageMode(CENTER);
-        image(this.imagem, pos.x, pos.y, this.raio, this.raio);
+        image(this.animation[index], 0, 0, this.raio, this.raio);
         pop();
-        if (this.corpo.velocity.x > 0 && pos.x > 10){
+        if (this.corpo.velocity.x > 0 && pos.x > 10 && !this.afundou){
             var position = [pos.x, pos.y];
             this.rastro.push(position);
             
@@ -37,7 +48,11 @@ class Bala {
 
 
 deletar(index){
-    Matter.Body.setVelocity(this.corpo, {x: 0, y: 0});  
+    this.afundou = true;
+    Matter.Body.setVelocity(this.corpo, {x: 0, y: 0});
+    this.animation = balaAnimation;
+    this.vel = 0.05;
+    this.raio = 150;  
     setTimeout(()=>{
         Matter.World.remove(world, this.corpo);
         delete balas[index];
