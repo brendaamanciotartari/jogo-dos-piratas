@@ -3,6 +3,8 @@ const World = Matter.World;
 const Bodies = Matter.Bodies;
 const Constraint = Matter.Constraint;
 
+var pirataRindo = false;
+
 var engine, world,chao;
 var fundo;
 var torre;
@@ -25,6 +27,15 @@ var naviosSpriteData0, naviosSpritesheet0;
 var balaAnimation = [];
 var balaSpriteData, balaSpritesheet;
 
+var gameOver = false;
+
+var fundoMusica;
+var explosao;
+var risada;
+var agua;
+
+var pontuacao = 0;
+
 
 function preload() {
  fundo = loadImage("./assets/background.gif");
@@ -35,6 +46,10 @@ function preload() {
  naviosSpritesheet0 = loadImage("./assets/boat/brokenBoat.png");
  balaSpriteData = loadJSON("./assets/waterSplash/waterSplash.json");
  balaSpritesheet = loadImage("./assets/waterSplash/waterSplash.png");
+ fundoMusica = loadSound("./sons/background_music.mp3");
+ explosao = loadSound("./sons/cannon_explosion.mp3");
+ risada = loadSound("./sons/pirate_laugh.mp3");
+ agua = loadSound("./sons/cannon_water.mp3");
 }
 
 function setup() {
@@ -87,6 +102,16 @@ function draw() {
   background(189);
   image(fundo, 0, 0, 1200, 600);
 
+  fill("black");
+  textSize(30);
+  text(pontuacao, width - 100, 50);
+
+  if(!fundoMusica.isPlaying()){
+    fundoMusica.play();
+    fundoMusica.setVolume(0.1);
+  }
+
+
   Engine.update(engine);
  
  rect(chao.position.x, chao.position.y,width*2,1);
@@ -111,6 +136,8 @@ function draw() {
 function keyReleased(){
   if(keyCode === DOWN_ARROW){
     balas[balas.length -1].atirar();
+    explosao.play();
+    explosao.setVolume(0.3);
   }
 
 }
@@ -128,6 +155,11 @@ function mostrarBalas(bala,i){
     bala.animacao();
     if(bala.corpo.position.x>=width || bala.corpo.position.y >= height - 50){
       bala.deletar(i);
+      if(bala.afundou === true){
+        agua.playMode("untilDone");
+        agua.play();
+        agua.setVolume(0.1);
+      }
     }
   } 
 }
@@ -146,6 +178,17 @@ function mostrarNavios(){
         Matter.Body.setVelocity(navios[i].corpo, {x:-0.9,y:0});
         navios[i].mostrar();
         navios[i].animacao();
+        var colide = Matter.SAT.collides(torre, navios[i].corpo);
+        
+        if(colide.collided && !navios[i].quebrado){
+         if(!pirataRindo && !risada.isPlaying()){
+           risada.play();
+           risada.setVolume(0.5);
+           pirataRindo = true;
+         }
+          gameOver = true;
+          acabou();
+        }
       }
     }
   } else {
@@ -162,9 +205,27 @@ function colisao(index){
         navios[i].deletar(i);
         Matter.World.remove(world,balas[index].corpo);
         delete balas[index];
+        pontuacao += 15;
       }
     }
   }
+}
+
+function acabou(){
+  swal(
+    {
+      title: "Vish, já era",
+      text: "Valeu, fera!",
+      imageUrl: "https://raw.githubusercontent.com/whitehatjr/PiratesInvasion/main/assets/boat.png",
+      imageSize: "150x150",
+      confirmButtonText: "Tente de novo!"
+    },
+    function(isConfirm){
+      if(isConfirm){
+        location.reload();
+      }
+    }
+  )
 }
 
 
